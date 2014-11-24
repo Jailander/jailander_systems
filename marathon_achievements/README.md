@@ -14,8 +14,9 @@ rosrun marathon_achievements achievement_monitor.py achievements.yaml
 
 Finally run the monitor node must be running for this to work
 ```
-rosrun strands_marathon_achievements achievement_monitor.py  _wipe_achievements:=<bool> _tweet_achievements:=<bool> _speak_achievements:=<bool>
+rosrun marathon_reporter mileage_monitor.py
 ```
+
 ## Defining Achievements
 
 Achievements are defined using a yaml file like the following please put the values in ascending order
