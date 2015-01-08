@@ -1,0 +1,36 @@
+<launch>
+    <arg name="pos_x" default="-4.10444888141"/>
+    <arg name="pos_y" default="-1.32365772104"/>
+    <arg name="ori_z" default="-0.698060797088"/>
+    <arg name="ori_w" default="0.716038493078"/>
+
+    <arg name="dataset" default="robolab"/>
+
+    <arg name="map" default="$(find strands_morse)/uol/maps/uol_mht_III.yaml"/>
+    <arg name="with_mux" default="false"/>
+
+
+
+    <!-- 2D Navigation -->
+    <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
+        <arg name="map" value="$(arg map)"/>
+    </include>
+
+
+     <!--- Docking -->
+    <include unless="$(arg with_mux)" file="$(find scitos_docking)/launch/charging.launch"/>
+    <include if="$(arg with_mux)" file="$(find scitos_docking)/launch/charging_mux.launch"/>
+
+
+    <node name="pose_initialiser" pkg="pose_initialiser" type="pose_initialiser.py" output="screen" args="$(arg pos_x) $(arg pos_y) $(arg ori_z) $(arg ori_w)"/>
+
+
+    <node pkg="monitored_navigation" type="monitored_nav.py" name="monitored_nav" output="screen"/>
+    <node pkg="topological_navigation" type="map_publisher.py" name="topological_map_publisher" args="$(arg dataset)"/>
+    <node pkg="topological_navigation" name="topological_localisation" type="localisation.py" output="screen"/>
+    <node pkg="topological_navigation" name="topological_navigation" type="navigation.py" output="screen"/>
+    <node pkg="topological_navigation" name="execute_policy_server" type="execute_policy_server.py" output="screen"/>
+    <node pkg="topological_navigation" type="visualise_map.py" name="visualise_map" args="$(arg dataset)"/>
+    <node pkg="topological_navigation" type="travel_time_estimator" name="travel_time_estimator"/> 
+
+</launch>

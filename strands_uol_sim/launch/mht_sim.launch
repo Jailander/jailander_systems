@@ -1,0 +1,38 @@
+<launch>
+  <arg name="env" default="uol_mht"/>
+  <arg name="pos_x" default="-4.10444888141"/>
+  <arg name="pos_y" default="-1.32365772104"/>
+  <arg name="ori_z" default="-0.698060797088"/>
+  <arg name="ori_w" default="0.716038493078"/>
+  <arg name="dataset" default="robolab"/>
+  <env name="HOSTNAME" value="localhost"/>
+
+  <!-- Scitos robot -->
+  <include file="$(find strands_morse)/launch/scitos.launch"/>
+
+  <node pkg="strands_morse" type="simulator.sh" respawn="false" name="strands_morse" output="screen" args="uol $(arg env).py"/>
+
+  <include file="$(find scitos_docking)/launch/charging.launch" />
+
+  <!-- 2D Navigation -->
+  <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
+      <arg name="map" value="$(find strands_morse)/uol/maps/uol_mht_III.yaml"/>
+  </include>
+
+
+  <!-- <include file="$(find mary_tts)/launch/ros_mary.launch"/> -->
+
+
+  <node name="pose_initialiser" pkg="pose_initialiser" type="pose_initialiser.py" output="screen" args="$(arg pos_x) $(arg pos_y) $(arg ori_z) $(arg ori_w)"/>
+
+  <!-- 
+	<node name="ramp_climb" pkg="ramp_climb" type="ramp_climb" output="screen"/> 
+  -->
+
+  <include file="$(find monitored_navigation)/launch/monitored_nav.launch"/>
+
+  <include file="$(find topological_navigation)/launch/topological_navigation.launch">
+      <arg name="map" value="$(arg dataset)"/>
+  </include>
+
+</launch>
